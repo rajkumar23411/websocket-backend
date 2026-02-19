@@ -1,10 +1,15 @@
-import { WebSocketServer } from "ws";
-import { WebSocket } from "ws";
+import { WebSocketServer, WebSocket } from "ws";
 
 function sendJSON(socket, payload) {
     if (socket.readyState !== WebSocket.OPEN) return false;
 
-    socket.send(JSON.stringify(payload));
+    try {
+        socket.send(JSON.stringify(payload));
+        return true;
+    } catch (error) {
+        console.error("Failed to send JSON to WebSocket.", error);
+        return false;
+    }
 }
 
 function broadcast(wss, payload) {
@@ -28,6 +33,10 @@ export function attachWebSocketServer(server) {
 
         socket.on("error", (error) => {
             console.error("WebSocket error:", error);
+        });
+
+        socket.on("close", (code, reason) => {
+            console.log(`WebSocket closed: code=${code}, reason=${reason}`);
         });
     });
 
