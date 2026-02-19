@@ -26,6 +26,12 @@ export function attachWebSocketServer(server) {
     });
 
     wss.on("connection", (socket) => {
+        socket.isAlive = true;
+
+        socket.on("pong", () => {
+            socket.isAlive = true;
+        });
+
         sendJSON(socket, {
             type: "welcome",
             message: "Welcome to the websocket server",
@@ -38,6 +44,20 @@ export function attachWebSocketServer(server) {
         socket.on("close", (code, reason) => {
             console.log(`WebSocket closed: code=${code}, reason=${reason}`);
         });
+    });
+
+    const interval = setInterval(() => {
+        for (const client of wss.clients) {
+            if (client.isAlive === false) {
+                return client.terminate();
+            }
+            client.isAlive = false;
+            client.ping();
+        }
+    }, 30000);
+
+    wss.on("close", () => {
+        clearInterval(interval);
     });
 
     function broadcastMatchCreated(match) {
