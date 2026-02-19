@@ -1,42 +1,35 @@
 import arcjet, { detectBot, shield, slidingWindow } from "@arcjet/node";
 
 const arcjetKey = process.env.ARCJET_API_KEY;
-const arcjectMode = process.env.ARCJET_MODE === "DRY_RUN" ? "DRY_RUN" : "LIVE";
+const arcjetMode = process.env.ARCJET_MODE === "DRY_RUN" ? "DRY_RUN" : "LIVE";
 
 if (!arcjetKey) {
     throw new Error("ARCJET_API_KEY is required");
 }
 
+const baseRules = [
+    shield({ mode: arcjetMode }),
+    detectBot({
+        mode: arcjetMode,
+        allow: ["CATEGORY:SEARCH_ENGINE", "CATEGORY:PREVIEW"],
+    }),
+    slidingWindow({ mode: arcjetMode, interval: "10s", max: 50 }),
+];
+
 export const httpArcjet = arcjet({
     apiKey: arcjetKey,
-    mode: arcjectMode,
-    rules: [
-        shield({ mode: arcjectMode }),
-        detectBot({
-            mode: arcjectMode,
-            allow: ["CATEGORY:SEARCH_ENGINE", "CATEGORY:PREVIEW"],
-        }),
-        slidingWindow({ mode: arcjectMode, interval: "10s", max: 50 }),
-    ],
+    mode: arcjetMode,
+    rules: baseRules,
 });
 
 export const socketArcjet = arcjet({
     apiKey: arcjetKey,
-    mode: arcjectMode,
-    rules: [
-        shield({ mode: arcjectMode }),
-        detectBot({
-            mode: arcjectMode,
-            allow: ["CATEGORY:SEARCH_ENGINE", "CATEGORY:PREVIEW"],
-        }),
-        slidingWindow({ mode: arcjectMode, interval: "2s", max: 5 }),
-    ],
+    mode: arcjetMode,
+    rules: baseRules,
 });
 
 export const securityMiddleware = () => {
     return async (req, res, next) => {
-        if (!httpArcjet) return next();
-
         try {
             const decision = await httpArcjet.protect(req);
 
