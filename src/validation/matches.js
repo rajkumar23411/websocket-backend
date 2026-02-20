@@ -36,3 +36,7 @@ export const updateScoreSchema = z.object({
 export const listMatchesQuerySchema = z.object({
     limit: z.coerce.number().int().positive().max(100).optional(),
 });
+
+export const matchIdSchema = z.object({
+    matchId: z.uuid(),
+});
