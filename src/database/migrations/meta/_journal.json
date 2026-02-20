@@ -15,6 +15,13 @@
       "when": 1771474091447,
       "tag": "0001_calm_mephistopheles",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1771562169309,
+      "tag": "0002_right_santa_claus",
+      "breakpoints": true
     }
   ]
 }
