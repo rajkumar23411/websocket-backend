@@ -16,6 +16,11 @@ app.use(express.json());
 app.use(securityMiddleware());
 
 // app routes
+app.get("/", (req, res) => {
+    return res.status(200).json({
+        message: "Welcome to websocket backend server.",
+    });
+});
 app.use("/matches", matchRouter);
 app.use("/matches/:matchId/commentary", commentaryRouter);
 
