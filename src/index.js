@@ -20,14 +20,18 @@ app.use("/matches", matchRouter);
 app.use("/matches/:matchId/commentary", commentaryRouter);
 
 // attach websocket server
-const { broadcastMatchCreated } = attachWebSocketServer(server);
+const { broadcastMatchCreated, broadcastCommentary } =
+    attachWebSocketServer(server);
+
 app.locals.broadcastMatchCreated = broadcastMatchCreated;
+app.locals.broadcastCommentary = broadcastCommentary;
 
 server.listen(PORT, HOST, () => {
     const baseURL =
         HOST === "0.0.0.0"
             ? `http://localhost:${PORT}`
             : `http://${HOST}:${PORT}`;
+
     const wsURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
 
     console.log(`Server is running on ${baseURL}`);

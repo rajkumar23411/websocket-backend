@@ -3,8 +3,10 @@ import { Router } from "express";
 import { db } from "../database/database.js";
 import { commentary } from "../database/schema.js";
 import { matchIdSchema } from "../validation/matches.js";
-import { createCommentarySchema } from "../validation/commentary.js";
-import { listCommentaryQuerySchema } from "../validation/commentary.js";
+import {
+    createCommentarySchema,
+    listCommentaryQuerySchema,
+} from "../validation/commentary.js";
 import { eq, desc } from "drizzle-orm";
 
 export const commentaryRouter = Router({ mergeParams: true });
@@ -41,6 +43,13 @@ commentaryRouter.post("/", async (req, res) => {
                 ...rest,
             })
             .returning();
+
+        if (req.app.locals.broadcastCommentary) {
+            req.app.locals.broadcastCommentary(
+                paramsResult.data.matchId,
+                result
+            );
+        }
 
         res.status(201).json({
             message: "Commentary created successfully.",
